@@ -122,33 +122,40 @@ void calc_interaction
   {
     Clistput(Cells,Next,count,pl,iPar);
   }
-  /*
+  
   for( iPar = 0 ; iPar < nPar ; iPar++ )   
   {
     for ( jPar = iPar+1 ; jPar < nPar ; jPar++ )
     {
       int_force( &pl->p[iPar] , &pl->p[jPar] );    
     }
-  }*/
+  }
 
-
+  
   int nCell = n_cell();
   int Neighbours[9];
 
   for ( int iCell = 0; iCell < nCell; iCell++ )
   {
+	Calcneighbour(iCell, Neighbours);
 	int iPar = Cells[iCell];
     while ( iPar != -1 )
 	{
-      Calcneighbour(iCell, Neighbours);
       for ( int i = 0; i < 9; i++ )
       {
 	    jPar = Cells[ Neighbours[i] ];
 	    while ( jPar != -1 )
 		{
-		  int_force( &pl->p[iPar] , &pl->p[jPar] );
-	    }
+		  printf("CHECK ipar and jpar\n");
+		  if ( iPar <  jPar )
+		  {
+            printf("iPar %d          jPar %d         nPar %d\n",iPar,jPar, nPar);
+		    int_force( &pl->p[iPar] , &pl->p[jPar] );
+		    jPar = Next[jPar];
+	      }   
+		}
 	  }
+	  iPar = Next[iPar];
     }
   }
 }
@@ -172,7 +179,7 @@ void int_force
   dr.y = pj->r.y - pi->r.y;
       
   dist = sqrt( dr.x*dr.x + dr.y*dr.y );
-
+  
   eps = pi->radius + pj->radius - dist;
    
   if ( eps > 0. )
@@ -222,7 +229,7 @@ void add_particle
 {
   double xpos;
   double rad;
-  
+
   int iPar = pl->ntot;	
 
   init_particle( &pl->p[iPar] );
@@ -322,9 +329,9 @@ double solve
   }
   
   calc_interaction( Cells, Next, count, pl );
-  
+
   add_gravity( pl );
-     
+     printf("GRAVITY\n");
   for ( iPar= pl->nwall + pl->ndoor ; iPar < nPar ; iPar++ )
   { 
     pl->p[iPar].a.x = pl->p[iPar].f.x/pl->p[iPar].mass;
@@ -332,12 +339,16 @@ double solve
     
     pl->p[iPar].v.x += 0.5*DT*pl->p[iPar].a.x;
     pl->p[iPar].v.y += 0.5*DT*pl->p[iPar].a.y;
-    
+    printf("%f\n",pl->p[iPar].f.x);
     ekin += pl->p[iPar].mass * ( pl->p[iPar].v.x*pl->p[iPar].v.x +
                                  pl->p[iPar].v.y*pl->p[iPar].v.y );
   }
-  
+  printf("Ekin   %f\n",ekin);
+
+	ekin = 0.00;
+
   return 0.5*ekin;
+	
 }
 
 
@@ -482,8 +493,8 @@ int n_cell(void)
 {
   int    cells_x, cells_y, Ncells;
 
-  cells_x = ceil((SILO_WIDTH  + 2*CELL_WIDTH)/CELL_WIDTH);
-  cells_y = ceil((SILO_HEIGHT + 2*CELL_WIDTH)/CELL_WIDTH);
+  cells_x = ceil((SILO_WIDTH )/CELL_WIDTH);
+  cells_y = ceil((SILO_HEIGHT)/CELL_WIDTH);
   
   Ncells = cells_x*cells_y;
   
@@ -543,8 +554,12 @@ void Clistput
   // Calculate the amount of horizontal cells
   cells_x = ceil(SILO_WIDTH/CELL_WIDTH);
 
-  coll = floor((pl->p[iPar].r.x + 0.5*SILO_WIDTH + 2*CELL_WIDTH)/CELL_WIDTH);
-  row  = floor((pl->p[iPar].r.y + 1              + 2*CELL_WIDTH)/CELL_WIDTH);
+  //coll = floor((pl->p[iPar].r.x + 0.5*SILO_WIDTH + 2*CELL_WIDTH)/CELL_WIDTH);
+  //row  = floor((pl->p[iPar].r.y + 1              + 2*CELL_WIDTH)/CELL_WIDTH);
+
+  coll = floor((pl->p[iPar].r.x + 0.5*SILO_WIDTH )/CELL_WIDTH);
+  row  = floor((pl->p[iPar].r.y + 1              )/CELL_WIDTH);
+
 
  // printf("particle x %f, particle y %f\n",pl->p[iPar].r.x,pl->p[iPar].r.y);
   ncell = coll + (row * cells_x);
@@ -567,15 +582,6 @@ void Calcneighbour
 
   int nCells = n_cell();
 
-  if ( Cell-n < 0 || Cell+n > nCells )
-  {
-    for ( int i = 0; i < 9; i++)
-    {
-	  Neighbours[i] = 0;
-	}
-  }
-  else
-  {
   Neighbours[0] = Cell-n-1;
   Neighbours[1] = Cell-n;
   Neighbours[2] = Cell-n+1;
@@ -585,6 +591,12 @@ void Calcneighbour
   Neighbours[6] = Cell+n-1;
   Neighbours[7] = Cell+n;
   Neighbours[8] = Cell+n+1;
+  
+  for ( int i = 0; i<=9; i++ )
+  {
+	if ( Neighbours[i] < 0 || Neighbours[i] > nCells)
+    {
+	  Neighbours[i] = 0;
+	}
   }
-
 }

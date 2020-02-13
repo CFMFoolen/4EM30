@@ -34,12 +34,13 @@ int main( void )
     if ( iCyc%50 == 0 && plist.ntot < plist.nwall + plist.ndoor + 2000 && plist.ndoor > 0 )
     {	
       add_particle( &plist );
+	  printf("particle added \n");
     }
     
     ekin = solve(Cells, Next, count, &plist );
      
     check_particles( &plist );
- 
+    
     if ( iCyc%1000 == 0 )
     {
       iPlot++;
