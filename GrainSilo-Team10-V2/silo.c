@@ -21,9 +21,8 @@ int main( void )
   
   int Cells[MAX_CELLS];
   int Next[MAX_PARTICLES];
-  int count = 0;
 
-  Clistclear(Cells, Next, count);
+  Clistclear(Cells, Next);
 
   read_input( "silo.dat" , &plist );
     
@@ -34,13 +33,12 @@ int main( void )
     if ( iCyc%50 == 0 && plist.ntot < plist.nwall + plist.ndoor + 2000 && plist.ndoor > 0 )
     {	
       add_particle( &plist );
-	  printf("particle added \n");
     }
     
-    ekin = solve(Cells, Next, count, &plist );
+    ekin = solve(Cells, Next, &plist );
      
     check_particles( &plist );
-    
+   
     if ( iCyc%1000 == 0 )
     {
       iPlot++;
@@ -55,9 +53,10 @@ int main( void )
     if ( iCyc > 100 && ekin < 1.0e-4 && plist.ndoor > 0 )
     {
       open_door( &plist );
-    }   
-  }
+    }  
 
+  }
+  printf("COMPLETE\n");
   return 0;
 }
 

@@ -20,7 +20,7 @@
 #define MAX_PARTICLES 3000
 #define MAX_CELLS 1800
 
-#define CELL_WIDTH 0.1
+#define CELL_WIDTH 0.05
 #define SILO_WIDTH 2.6
 #define SILO_HEIGHT 5
 
@@ -131,7 +131,6 @@ double solve
 
   ( int *Cells,
     int *Next,
-    int count, 
 	Plist *pl);
 
 
@@ -145,7 +144,6 @@ void calc_interaction
   
   ( int *Cells,
     int *Next,
-    int count, 
 	Plist *pl);
  
 //-----------------------------------------------------------------------------
@@ -228,8 +226,7 @@ int n_cell( void );
 void Clistclear
 
   ( int *Cells,
-    int *Next,
-    int count );
+    int *Next );
 
 
 //-----------------------------------------------------------------------------
@@ -239,7 +236,7 @@ void Clistclear
 
 bool ClistisEmpty
 
-  ( int count);
+  ( int *Cells);
 
 //-----------------------------------------------------------------------------
 //  pre:    -
@@ -250,7 +247,6 @@ void Clistput
 	
 	( int *Cells,
 	  int *Next,
-	  int count,
 	  Plist *pl,
       int iPar );
 

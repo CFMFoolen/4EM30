@@ -108,28 +108,27 @@ void calc_interaction
 
   ( int *Cells,
     int *Next,
-    int count, 
 	Plist *pl)
  
 {
   int      iPar,jPar;
  
   const int nPar = pl->ntot;
-  Clistclear(Cells,Next,count);
+  Clistclear(Cells,Next);
   
   for( iPar = 0 ; iPar < nPar ; iPar++ )   
   
   {
-    Clistput(Cells,Next,count,pl,iPar);
+    Clistput(Cells,Next,pl,iPar);
   }
   
-  for( iPar = 0 ; iPar < nPar ; iPar++ )   
+  /*for( iPar = 0 ; iPar < nPar ; iPar++ )   
   {
     for ( jPar = iPar+1 ; jPar < nPar ; jPar++ )
     {
       int_force( &pl->p[iPar] , &pl->p[jPar] );    
     }
-  }
+  }*/
 
   
   int nCell = n_cell();
@@ -146,13 +145,11 @@ void calc_interaction
 	    jPar = Cells[ Neighbours[i] ];
 	    while ( jPar != -1 )
 		{
-		  printf("CHECK ipar and jpar\n");
 		  if ( iPar <  jPar )
 		  {
-            printf("iPar %d          jPar %d         nPar %d\n",iPar,jPar, nPar);
 		    int_force( &pl->p[iPar] , &pl->p[jPar] );
-		    jPar = Next[jPar];
 	      }   
+		  jPar = Next[jPar];
 		}
 	  }
 	  iPar = Next[iPar];
@@ -303,8 +300,7 @@ void init_particle
 double solve
 
   ( int *Cells,
-    int *Next,
-    int count, 
+    int *Next, 
 	Plist *pl)
 
 {
@@ -328,10 +324,10 @@ double solve
     pl->p[iPar].f.y = 0.;
   }
   
-  calc_interaction( Cells, Next, count, pl );
+  calc_interaction( Cells, Next, pl );
 
   add_gravity( pl );
-     printf("GRAVITY\n");
+ 
   for ( iPar= pl->nwall + pl->ndoor ; iPar < nPar ; iPar++ )
   { 
     pl->p[iPar].a.x = pl->p[iPar].f.x/pl->p[iPar].mass;
@@ -339,13 +335,10 @@ double solve
     
     pl->p[iPar].v.x += 0.5*DT*pl->p[iPar].a.x;
     pl->p[iPar].v.y += 0.5*DT*pl->p[iPar].a.y;
-    printf("%f\n",pl->p[iPar].f.x);
+    
     ekin += pl->p[iPar].mass * ( pl->p[iPar].v.x*pl->p[iPar].v.x +
                                  pl->p[iPar].v.y*pl->p[iPar].v.y );
   }
-  printf("Ekin   %f\n",ekin);
-
-	ekin = 0.00;
 
   return 0.5*ekin;
 	
@@ -508,43 +501,40 @@ int n_cell(void)
 void Clistclear
 
   ( int *Cells,
-    int *Next,
-    int count )
+    int *Next )
 
 {
-  count = 0;
 
   for ( int i = 0; i < MAX_CELLS; i++ )
   {
 	Cells[i] = -1;
   }
-  for ( int i = 0; i < MAX_PARTICLES; i++ )
-  {
-    Next[i] = -1;
-  }
+ // for ( int i = 0; i < MAX_PARTICLES; i++ )
+  //{
+  //  Next[i] = -1;
+  //}
 }
   
 
 bool ClistisEmpty
 
-  ( int count )
+  ( int *Cells )
 
 {
-  if ( count == 0 )
+  for ( int i = 0; i<MAX_CELLS; i++ )
   {
-    return true;
+    if ( Cells[i] != -1 )
+    {
+      return false;
+    }
   }
-  else
-  {
-    return false;
-  }
+  return true;
 }
 
 void Clistput
 	
   ( int *Cells,
-    int *Next,
-    int count, 
+    int *Next, 
 	Plist *pl, 
 	int iPar )
 
@@ -554,22 +544,16 @@ void Clistput
   // Calculate the amount of horizontal cells
   cells_x = ceil(SILO_WIDTH/CELL_WIDTH);
 
-  //coll = floor((pl->p[iPar].r.x + 0.5*SILO_WIDTH + 2*CELL_WIDTH)/CELL_WIDTH);
-  //row  = floor((pl->p[iPar].r.y + 1              + 2*CELL_WIDTH)/CELL_WIDTH);
-
   coll = floor((pl->p[iPar].r.x + 0.5*SILO_WIDTH )/CELL_WIDTH);
   row  = floor((pl->p[iPar].r.y + 1              )/CELL_WIDTH);
 
-
- // printf("particle x %f, particle y %f\n",pl->p[iPar].r.x,pl->p[iPar].r.y);
   ncell = coll + (row * cells_x);
- // printf("Cell number %d,    Cell col: %d,     Cell row: %d\n",ncell, coll, row);
+ 
   oldID = Cells[ ncell ];
 
   Cells[ ncell ] = iPar;
   
   Next[ iPar ] = oldID;
-  count = count++;
 }
 
 
