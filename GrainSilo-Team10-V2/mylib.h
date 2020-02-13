@@ -18,9 +18,9 @@
 
 #define GRAVITY 9.81
 #define MAX_PARTICLES 3000
-#define MAX_CELLS 1800
+#define MAX_CELLS 700
 
-#define CELL_WIDTH 0.05
+#define CELL_WIDTH 0.14
 #define SILO_WIDTH 2.6
 #define SILO_HEIGHT 5
 

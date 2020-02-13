@@ -562,7 +562,7 @@ void Calcneighbour
 	( int Cell,
       int *Neighbours )
 {
-  int n = ceil(2.6/CELL_WIDTH);
+  int n = ceil(SILO_WIDTH/CELL_WIDTH);
 
   int nCells = n_cell();
 
@@ -578,7 +578,7 @@ void Calcneighbour
   
   for ( int i = 0; i<=9; i++ )
   {
-	if ( Neighbours[i] < 0 || Neighbours[i] > nCells)
+	if ( Neighbours[i] < 0 || Neighbours[i] > nCells )//|| Neighbours[i]%n==0 || Neighbours[i]%n==n-1
     {
 	  Neighbours[i] = 0;
 	}
