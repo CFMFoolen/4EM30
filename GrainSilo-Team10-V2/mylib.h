@@ -14,13 +14,14 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 
 #define GRAVITY 9.81
 #define MAX_PARTICLES 3000
-#define MAX_CELLS 700
+#define MAX_CELLS 1350
 
-#define CELL_WIDTH 0.14
+#define CELL_WIDTH 0.1
 #define SILO_WIDTH 2.6
 #define SILO_HEIGHT 5
 
@@ -213,14 +214,14 @@ void check_particles
 
 //-----------------------------------------------------------------------------
 //  pre:    -
-//  post:   ?
-//  return: -
+//  post:   Calculates the number of cells
+//  return: The amount of cells
 
 int n_cell( void );
 
 //-----------------------------------------------------------------------------
 //  pre:    -
-//  post:   ?
+//  post:   Clears the Cells array by replacing all particle numbers with -1
 //  return: -
 
 void Clistclear
@@ -231,8 +232,8 @@ void Clistclear
 
 //-----------------------------------------------------------------------------
 //  pre:    -
-//  post:   ?
-//  return: -
+//  post:   Checks if the Cells array is filled with -1
+//  return: Returns true if the array is empty and false if the array is not empty
 
 bool ClistisEmpty
 
@@ -240,24 +241,24 @@ bool ClistisEmpty
 
 //-----------------------------------------------------------------------------
 //  pre:    -
-//  post:   ?
+//  post:   Puts an particle index in the linked list
 //  return: -
 
 void Clistput
 	
-	( int *Cells,
-	  int *Next,
-	  Plist *pl,
+    ( int *Cells,
+      int *Next,
+      Plist *pl,
       int iPar );
 
 //-----------------------------------------------------------------------------
 //  pre:    -
-//  post:   ?
+//  post:   Calculates the neighbouring cells and updates the array Neighbours
 //  return: -
 
 void Calcneighbour
 
-	( int Cell,
+    ( int Cell,
       int *Neighbours );
 
 

@@ -25,6 +25,8 @@ int main( void )
   Clistclear(Cells, Next);
 
   read_input( "silo.dat" , &plist );
+  
+  printf("Simulation started\n");
     
   while( iCyc < 100 || ekin > 1.0e-8 )
   {
@@ -47,7 +49,7 @@ int main( void )
       
       plot( svgfile , &plist );
 
-      show_info( svgfile , ekin , plist.ntot );
+      //show_info( svgfile , ekin , plist.ntot );
     }
 
     if ( iCyc > 100 && ekin < 1.0e-4 && plist.ndoor > 0 )
@@ -56,7 +58,9 @@ int main( void )
     }  
 
   }
-  printf("COMPLETE\n");
+  clock_t end = clock();
+  double time = (double)( end ) / CLOCKS_PER_SEC;
+  printf("Complete in %f seconds\n",time);
   return 0;
 }
 

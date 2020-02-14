@@ -108,51 +108,44 @@ void calc_interaction
 
   ( int *Cells,
     int *Next,
-	Plist *pl)
+    Plist *pl)
  
 {
-  int      iPar,jPar;
+  int iPar,jPar;
+  int Neighbours[9];
+
+  int nCell = n_cell();
  
   const int nPar = pl->ntot;
+
   Clistclear(Cells,Next);
   
   for( iPar = 0 ; iPar < nPar ; iPar++ )   
-  
   {
     Clistput(Cells,Next,pl,iPar);
   }
-  
-  /*for( iPar = 0 ; iPar < nPar ; iPar++ )   
-  {
-    for ( jPar = iPar+1 ; jPar < nPar ; jPar++ )
-    {
-      int_force( &pl->p[iPar] , &pl->p[jPar] );    
-    }
-  }*/
-
-  
-  int nCell = n_cell();
-  int Neighbours[9];
 
   for ( int iCell = 0; iCell < nCell; iCell++ )
   {
-	Calcneighbour(iCell, Neighbours);
-	int iPar = Cells[iCell];
+    Calcneighbour( iCell, Neighbours );
+
+    int iPar = Cells[iCell];
+
     while ( iPar != -1 )
-	{
+    {
       for ( int i = 0; i < 9; i++ )
       {
-	    jPar = Cells[ Neighbours[i] ];
-	    while ( jPar != -1 )
-		{
-		  if ( iPar <  jPar )
-		  {
-		    int_force( &pl->p[iPar] , &pl->p[jPar] );
-	      }   
-		  jPar = Next[jPar];
-		}
-	  }
-	  iPar = Next[iPar];
+        jPar = Cells[ Neighbours[i] ];
+        while ( jPar != -1 )
+        {
+          if ( iPar < jPar )
+          {
+            int_force( &pl->p[iPar] , &pl->p[jPar] );
+          }   
+        jPar = Next[jPar];
+        }
+      }
+      iPar = Next[iPar];
     }
   }
 }
@@ -301,7 +294,7 @@ double solve
 
   ( int *Cells,
     int *Next, 
-	Plist *pl)
+    Plist *pl)
 
 {
   const double dt2 = DT * DT;
@@ -486,10 +479,10 @@ int n_cell(void)
 {
   int    cells_x, cells_y, Ncells;
 
-  cells_x = ceil((SILO_WIDTH )/CELL_WIDTH);
-  cells_y = ceil((SILO_HEIGHT)/CELL_WIDTH);
+  cells_x = ceil( SILO_WIDTH  / CELL_WIDTH );
+  cells_y = ceil( SILO_HEIGHT / CELL_WIDTH );
   
-  Ncells = cells_x*cells_y;
+  Ncells = cells_x * cells_y;
   
   return Ncells;
 }
@@ -507,12 +500,8 @@ void Clistclear
 
   for ( int i = 0; i < MAX_CELLS; i++ )
   {
-	Cells[i] = -1;
+    Cells[i] = -1;
   }
- // for ( int i = 0; i < MAX_PARTICLES; i++ )
-  //{
-  //  Next[i] = -1;
-  //}
 }
   
 
@@ -521,7 +510,7 @@ bool ClistisEmpty
   ( int *Cells )
 
 {
-  for ( int i = 0; i<MAX_CELLS; i++ )
+  for ( int i = 0; i < MAX_CELLS; i++ )
   {
     if ( Cells[i] != -1 )
     {
@@ -535,23 +524,23 @@ void Clistput
 	
   ( int *Cells,
     int *Next, 
-	Plist *pl, 
-	int iPar )
+    Plist *pl, 
+    int iPar )
 
 {
-  int cells_x, row, coll, ncell;
+  int cells_x, row, coll, cell;
   int oldID;
-  // Calculate the amount of horizontal cells
-  cells_x = ceil(SILO_WIDTH/CELL_WIDTH);
+  
+  cells_x = ceil( SILO_WIDTH / CELL_WIDTH );
 
-  coll = floor((pl->p[iPar].r.x + 0.5*SILO_WIDTH )/CELL_WIDTH);
-  row  = floor((pl->p[iPar].r.y + 1              )/CELL_WIDTH);
+  coll = floor( ( pl->p[iPar].r.x + 0.5 * SILO_WIDTH ) / CELL_WIDTH );
+  row  = floor( ( pl->p[iPar].r.y + 1                ) / CELL_WIDTH );
 
-  ncell = coll + (row * cells_x);
+  cell = coll + ( row * cells_x );
  
-  oldID = Cells[ ncell ];
+  oldID = Cells[ cell ];
 
-  Cells[ ncell ] = iPar;
+  Cells[ cell ] = iPar;
   
   Next[ iPar ] = oldID;
 }
@@ -559,28 +548,28 @@ void Clistput
 
 void Calcneighbour
 
-	( int Cell,
+    ( int Cell,
       int *Neighbours )
 {
-  int n = ceil(SILO_WIDTH/CELL_WIDTH);
+  int n = ceil( SILO_WIDTH / CELL_WIDTH );
 
   int nCells = n_cell();
 
-  Neighbours[0] = Cell-n-1;
-  Neighbours[1] = Cell-n;
-  Neighbours[2] = Cell-n+1;
-  Neighbours[3] = Cell-1;
-  Neighbours[4] = Cell;
-  Neighbours[5] = Cell+1;
-  Neighbours[6] = Cell+n-1;
-  Neighbours[7] = Cell+n;
-  Neighbours[8] = Cell+n+1;
+  Neighbours[0] = Cell - n - 1;
+  Neighbours[1] = Cell - n    ;
+  Neighbours[2] = Cell - n + 1;
+  Neighbours[3] = Cell     - 1;
+  Neighbours[4] = Cell        ;
+  Neighbours[5] = Cell     + 1;
+  Neighbours[6] = Cell + n - 1;
+  Neighbours[7] = Cell + n    ;
+  Neighbours[8] = Cell + n + 1;
   
-  for ( int i = 0; i<=9; i++ )
+  for ( int i = 0; i <= 9; i++ )
   {
-	if ( Neighbours[i] < 0 || Neighbours[i] > nCells )//|| Neighbours[i]%n==0 || Neighbours[i]%n==n-1
+    if ( Neighbours[i] < 0 || Neighbours[i] > nCells  )
     {
-	  Neighbours[i] = 0;
-	}
+      Neighbours[i] = 0;
+    }
   }
 }
